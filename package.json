@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "Practice of the vidtube i am doing",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/index.js"
   },
   "keywords": [
     "express",
