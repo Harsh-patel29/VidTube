@@ -2,7 +2,10 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { AsyncHandler } from "../utils/AsyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.models.js";
-import { uploadOnClodinary } from "../utils/cloudinary.js";
+import {
+  deletefromCloudinary,
+  uploadOnClodinary,
+} from "../utils/cloudinary.js";
 
 const registerUser = AsyncHandler(async (req, res) => {
   const { fullname, email, password, username } = req.body;
@@ -63,6 +66,12 @@ const registerUser = AsyncHandler(async (req, res) => {
       .json(new ApiResponse(201, createdUser, "User registered Successfully"));
   } catch (error) {
     console.log("User creation Failed");
+    if (avatar) {
+      await deletefromCloudinary(avatar.public_id);
+    }
+    if (coverImage) {
+      await deletefromCloudinary(coverImage.public_id);
+    }
     throw new ApiError(500, "Something went wrong while creating user");
   }
 });
