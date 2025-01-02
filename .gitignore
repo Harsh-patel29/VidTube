@@ -2,3 +2,4 @@
 .prettierIgnore
 .prettierrc
 .env
+/public
