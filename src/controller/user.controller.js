@@ -12,7 +12,7 @@ dotenv.config();
 
 const generateAccessandRefreshToken = async (userID) => {
   try {
-    const user = User.findById(userID);
+    const user = await User.findById(userID);
     if (!user) {
       throw new ApiError(404, 'User not found');
     }
@@ -24,6 +24,8 @@ const generateAccessandRefreshToken = async (userID) => {
     await user.save({
       validateBeforeSave: false,
     });
+    // console.log(user);
+
     return { accessToken, refreshToken };
   } catch (error) {
     throw new ApiError(
@@ -107,14 +109,25 @@ const loggedInUser = AsyncHandler(async (req, res) => {
   if (!username || !email) {
     throw new ApiError(404, 'Username and email required');
   }
-  const user = User.findOne({
+  const user = await User.findOne({
     $or: [{ username }, { email }],
   });
-  const isPasswordCorrect = user.isPasswordCorrect(password);
-  if (!isPasswordCorrect) {
+  // console.log(user.isPasswordCorrect);
+
+  if (!user) {
+    throw new ApiError(404, 'User not found');
+  }
+  // console.log(user);
+
+  const isPasswordValid = await user.isPasswordCorrect(password);
+  if (!isPasswordValid) {
     throw new ApiError(404, 'Wrong credentials');
   }
-  const { accessToken, refreshToken } = await generateAccessandRefreshToken();
+  //isPasswordCoreect show me an error because i was exorting User in userSchema earlier than the isPasswordCorrect Method.
+
+  const { accessToken, refreshToken } = await generateAccessandRefreshToken(
+    user._id
+  );
   const loggedInUser = await User.findById(user._id).select(
     '-password -refreshToken'
   );
@@ -197,4 +210,4 @@ const refreshToken = AsyncHandler(async (req, res) => {
     );
   }
 });
-export { registerUser };
+export { registerUser, loggedInUser };
