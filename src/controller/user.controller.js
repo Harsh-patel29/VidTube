@@ -165,12 +165,12 @@ const logOutUser = AsyncHandler(async (req, res) => {
   const options = { httpOnly: true };
   return res
     .status(200)
-    .clearCookie('accessToken', accessToken)
-    .clearCookie('refreshToken', refreshToken)
+    .clearCookie('accessToken', options)
+    .clearCookie('refreshToken', options)
     .json(new ApiResponse(200, {}, 'User Logged Out sucessfully'));
 });
 
-const refreshToken = AsyncHandler(async (req, res) => {
+const refreshAcessToken = AsyncHandler(async (req, res) => {
   const incomingRefreshToken = req.body.refreshToken || req.cookie.refreshToken;
   if (!incomingRefreshToken) {
     throw new ApiError(404, 'Refresh Token is required');
@@ -210,4 +210,4 @@ const refreshToken = AsyncHandler(async (req, res) => {
     );
   }
 });
-export { registerUser, loggedInUser };
+export { registerUser, loggedInUser, logOutUser };

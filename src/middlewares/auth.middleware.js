@@ -1,14 +1,15 @@
 import jwt from 'jsonwebtoken';
-import { AsyncHandler } from '../utils/AsyncHandler';
-import { ApiError } from '../utils/ApiError';
-import { User } from '../models/user.models';
+import { AsyncHandler } from '../utils/AsyncHandler.js';
+import { ApiError } from '../utils/ApiError.js';
+import { User } from '../models/user.models.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
 export const verifyJwt = AsyncHandler(async (req, res, next) => {
   const token =
-    (req.cookies && req.cookies.accessToken) ||
-    (req.header('Authorization').startsWith('Bearer ') &&
+    (req.cookies && req.cookies.AccessToken) ||
+    (req.header('Authorization') &&
+      req.header('Authorization').startsWith('Bearer ') &&
       req.header('Authorization').replace('Bearer ', ''));
   if (!token) {
     throw new ApiError(404, 'Unauthorized');

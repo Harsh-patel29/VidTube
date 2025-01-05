@@ -25,9 +25,10 @@ app.use(cookieParser());
 import healthCheckRouter from './routes/healthCheck.routes.js';
 import userRouter from './routes/user.routes.js';
 import loggedInUserRouter from './routes/user.routes.js';
+import logOutUserRouter from './routes/user.routes.js';
 
 app.use('/api/v1/healthcheck', healthCheckRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/users', loggedInUserRouter);
-
+app.use('/api/v1/users', logOutUserRouter);
 export { app };
