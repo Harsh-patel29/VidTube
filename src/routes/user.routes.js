@@ -1,28 +1,62 @@
-import { Router } from 'express';
-import { registerUser } from '../controller/user.controller.js';
-import { loggedInUser } from '../controller/user.controller.js';
-import { logOutUser } from '../controller/user.controller.js';
-import { upload } from '../middlewares/multer.middleware.js';
-import { verifyJwt } from '../middlewares/auth.middleware.js';
-import multer from 'multer';
+import { Router } from "express";
+import {
+  registerUser,
+  logOutUser,
+  loggedInUser,
+  changeCurrentPassword,
+  getCurrentUser,
+  UpdateAccountDetails,
+  UpdateUserAvatar,
+  UpdateCoverImage,
+} from "../controller/user.controller.js";
+import { upload } from "../middlewares/multer.middleware.js";
+import { verifyJwt } from "../middlewares/auth.middleware.js";
+import multer from "multer";
 
 const router = Router();
 
 const UploadText = multer();
 
-router.route('/register').post(
+router.route("/register").post(
   upload.fields([
     {
-      name: 'avatar',
+      name: "avatar",
       maxCount: 1,
     },
     {
-      name: 'coverImage',
+      name: "coverImage",
       maxCount: 1,
     },
   ]),
   registerUser
 );
-router.route('/login').post(UploadText.none(), loggedInUser);
-router.route('/logout').post(UploadText.none(), verifyJwt, logOutUser);
+router.route("/login").post(UploadText.none(), loggedInUser);
+router.route("/logout").post(UploadText.none(), verifyJwt, logOutUser);
+router
+  .route("/changePassword")
+  .post(UploadText.none(), verifyJwt, changeCurrentPassword);
+router.route("/getAccountDetails").get(verifyJwt, getCurrentUser);
+router
+  .route("/updateAccountDetail")
+  .post(UploadText.none(), verifyJwt, UpdateAccountDetails);
+router.route("/UpdateAvatar").post(
+  upload.fields([
+    {
+      name: "avatar",
+      maxCount: 1,
+    },
+  ]),
+  verifyJwt,
+  UpdateUserAvatar
+);
+router.route("/updatecoverimage").post(
+  upload.fields([
+    {
+      name: "coverImage",
+      maxCount: 1,
+    },
+  ]),
+  verifyJwt,
+  UpdateCoverImage
+);
 export default router;
