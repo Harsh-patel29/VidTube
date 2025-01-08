@@ -8,6 +8,7 @@ import {
 } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import mongoose, { Mongoose } from "mongoose";
 dotenv.config();
 
 const generateAccessandRefreshToken = async (userID) => {
@@ -315,6 +316,132 @@ const UpdateCoverImage = AsyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, user, "CoverImage updated successfully"));
 });
+
+const getUserChannelProfile = AsyncHandler(async (req, res) => {
+  const { username } = req.params;
+
+  if (!username?.trim()) {
+    throw new ApiError(400, "Username is required");
+  }
+  const channel = await User.aggregate([
+    {
+      $match: {
+        username: username?.toLowerCase(),
+      },
+    },
+    {
+      $lookup: {
+        from: "Subscription",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subscribers",
+      },
+    },
+    {
+      $lookup: {
+        from: "Subscription",
+        localField: "_id",
+        foreignField: "subcriber",
+        as: "subcribedTo",
+      },
+    },
+    {
+      $addFields: {
+        subscribersCount: { $size: { $ifNull: ["$subscribers", []] } },
+        channelsSubcribedTO: { $size: { $ifNull: ["$subcribedTo", []] } },
+        isSubcribed: {
+          $cond: [
+            { $in: [req.user?._id, "$subscribers.subcriber"] },
+            true,
+            false,
+          ],
+        },
+      },
+    },
+    {
+      $project: {
+        fullname: 1,
+        username: 1,
+        avatar: 1,
+        subscribersCount: 1,
+        channelsSubcribedTO: 1,
+        isSubcribed: 1,
+        coverImage: 1,
+        email: 1,
+      },
+    },
+  ]);
+
+  if (!channel?.length) {
+    throw new ApiError(404, "Channel not found");
+  }
+  // console.log(channel);
+  // console.log(channel[0]);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, channel[0], "Channel profile fetched Properly!")
+    );
+});
+
+const getWatchHistory = AsyncHandler(async (req, res) => {
+  const user = await User.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(req.user?._id),
+      },
+    },
+    {
+      $lookup: {
+        from: "videos",
+        localField: "watchHistory",
+        foreignField: "_id",
+        as: "WatchHistory",
+        pipeline: [
+          {
+            $lookup: {
+              from: "users",
+              localField: "owner",
+              foreignField: "_id",
+              as: "owner",
+              pipeline: [
+                {
+                  $project: {
+                    fullname: 1,
+                    username: 1,
+                    avatar: 1,
+                  },
+                },
+              ],
+            },
+          },
+          {
+            $addFields: {
+              owner: {
+                $first: "$owner",
+              },
+            },
+          },
+        ],
+      },
+    },
+  ]);
+  if (!user) {
+    throw new ApiError("User not found");
+  }
+  // console.log(user[0].WatchHistory);
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        user[0]?.WatchHistory,
+        "Watch history fetched successfully!"
+      )
+    );
+});
+
 export {
   registerUser,
   loggedInUser,
@@ -324,4 +451,6 @@ export {
   UpdateAccountDetails,
   UpdateUserAvatar,
   UpdateCoverImage,
+  getUserChannelProfile,
+  getWatchHistory,
 };
