@@ -36,31 +36,17 @@ router.route("/login").post(UploadText.none(), loggedInUser);
 router.route("/logout").post(UploadText.none(), verifyJwt, logOutUser);
 router
   .route("/changePassword")
-  .post(UploadText.none(), verifyJwt, changeCurrentPassword);
+  .patch(UploadText.none(), verifyJwt, changeCurrentPassword);
 router.route("/getAccountDetails").get(verifyJwt, getCurrentUser);
 router
   .route("/updateAccountDetail")
-  .post(UploadText.none(), verifyJwt, UpdateAccountDetails);
-router.route("/UpdateAvatar").post(
-  upload.fields([
-    {
-      name: "avatar",
-      maxCount: 1,
-    },
-  ]),
-  verifyJwt,
-  UpdateUserAvatar
-);
-router.route("/updatecoverimage").post(
-  upload.fields([
-    {
-      name: "coverImage",
-      maxCount: 1,
-    },
-  ]),
-  verifyJwt,
-  UpdateCoverImage
-);
+  .patch(UploadText.none(), verifyJwt, UpdateAccountDetails);
+router
+  .route("/UpdateAvatar")
+  .patch(upload.single("avatar"), verifyJwt, UpdateUserAvatar);
+router
+  .route("/updatecoverimage")
+  .patch(upload.single("coverImage"), verifyJwt, UpdateCoverImage);
 router
   .route("/getchannelDetails/:username")
   .get(verifyJwt, getUserChannelProfile);

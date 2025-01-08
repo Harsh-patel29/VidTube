@@ -238,11 +238,12 @@ const getCurrentUser = AsyncHandler(async (req, res) => {
 
 const UpdateAccountDetails = AsyncHandler(async (req, res) => {
   const { username, email, fullname } = req.body;
+
   if (!username || !email || !fullname) {
     throw new ApiError(400, "Any of these fields are required");
   }
   const user = await User.findByIdAndUpdate(
-    req.body._id,
+    req.user._id,
     {
       $set: {
         username: username,
@@ -254,14 +255,14 @@ const UpdateAccountDetails = AsyncHandler(async (req, res) => {
       new: true,
     }
   ).select("-password -refreshToken");
-  console.log(user);
+
   return res
     .status(200)
     .json(new ApiResponse(200, user, "Account details updated Successfully"));
 });
 
 const UpdateUserAvatar = AsyncHandler(async (req, res) => {
-  const avatarLocalFilePath = req.files?.avatar?.[0]?.path;
+  const avatarLocalFilePath = req.file?.path;
 
   if (!avatarLocalFilePath) {
     throw new ApiError(400, "Avatar file is required.");
@@ -290,7 +291,7 @@ const UpdateUserAvatar = AsyncHandler(async (req, res) => {
 });
 
 const UpdateCoverImage = AsyncHandler(async (req, res) => {
-  const coverImageLocalFilePath = req.files?.coverImage?.[0]?.path;
+  const coverImageLocalFilePath = req.file?.path;
   if (!coverImageLocalFilePath) {
     throw new ApiError(400, "Cover Image is needed");
   }
