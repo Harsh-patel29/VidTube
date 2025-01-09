@@ -72,9 +72,18 @@ const publishVideo = AsyncHandler(async (req, res) => {
     throw new ApiError(500, "Something went wrong while publishing video");
   }
 
+  const uploadBY = req.user.username;
+  console.log(uploadBY);
+
   return res
     .status(200)
-    .json(new ApiResponse(200, videoDetails, `Video Published Successfully!!`));
+    .json(
+      new ApiResponse(
+        200,
+        videoDetails,
+        `Video Published Successfully By ${uploadBY}!!`
+      )
+    );
 
   //   const user = await User.aggregate([
   //     {
@@ -94,4 +103,67 @@ const publishVideo = AsyncHandler(async (req, res) => {
   //   console.log(user);
 });
 
-export { publishVideo };
+const getVideoByusername = AsyncHandler(async (req, res) => {
+  const { username } = req.params;
+  // console.log(username);
+
+  if (!username) {
+    throw new ApiError(404, "Username is required");
+  }
+
+  const details = await Video.aggregate([
+    {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    {
+      $project: {
+        tittle: 1,
+        description: 1,
+      },
+    },
+  ]);
+
+  // console.log(details);
+
+  if (!details) {
+    throw new ApiError(400, "User has not uploaded any video");
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, details, `Video published by ${username} are`));
+});
+
+const getVideoById = AsyncHandler(async (req, res) => {
+  const { VideoId } = req.params;
+
+  const id = new mongoose.Types.ObjectId(VideoId);
+
+  const videoDetail = await Video.aggregate([
+    {
+      $match: {
+        _id: id,
+      },
+    },
+    {
+      $project: {
+        tittle: 1,
+        description: 1,
+      },
+    },
+  ]);
+  console.log(videoDetail);
+
+  if (!videoDetail) {
+    throw new ApiError(404, "Video with this Id do not exists.");
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, videoDetail, "Video with particular ID found"));
+});
+
+export { publishVideo, getVideoByusername, getVideoById };

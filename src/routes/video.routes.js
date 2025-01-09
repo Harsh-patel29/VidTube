@@ -1,8 +1,15 @@
 import { Router } from "express";
-import { publishVideo } from "../controller/video.cotroller.js";
+import {
+  publishVideo,
+  getVideoByusername,
+  getVideoById,
+} from "../controller/video.cotroller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJwt } from "../middlewares/auth.middleware.js";
+import multer from "multer";
 const router = Router();
+
+const UploadText = multer();
 
 router.route("/publishVideo").post(
   upload.fields([
@@ -19,4 +26,8 @@ router.route("/publishVideo").post(
   publishVideo
 );
 
+router
+  .route("/getVideoByusername/:username")
+  .get(verifyJwt, getVideoByusername);
+router.route("/getVideoById/:VideoId").get(verifyJwt, getVideoById);
 export default router;
