@@ -33,6 +33,7 @@ import UpdateUserAvatarRouter from "./routes/user.routes.js";
 import UpdateCoverImageRouter from "./routes/user.routes.js";
 import getUserChannelProfileRouter from "./routes/user.routes.js";
 import getWatchHistoryRouter from "./routes/user.routes.js";
+import publishVideoRouter from "./routes/video.routes.js";
 
 app.use("/api/v1/healthcheck", healthCheckRouter);
 app.use("/api/v1/users", userRouter);
@@ -45,4 +46,6 @@ app.use("/api/v1/users", UpdateUserAvatarRouter);
 app.use("/api/v1/users", UpdateCoverImageRouter);
 app.use("/api/v1/users", getUserChannelProfileRouter);
 app.use("/api/v1/users", getWatchHistoryRouter);
+app.use("/api/v1/video", publishVideoRouter);
+
 export { app };
