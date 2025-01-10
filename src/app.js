@@ -36,6 +36,8 @@ import getWatchHistoryRouter from "./routes/user.routes.js";
 import publishVideoRouter from "./routes/video.routes.js";
 import getVideoByusernameRouter from "./routes/video.routes.js";
 import getVideoByIdRouter from "./routes/video.routes.js";
+import getAllvideosRouter from "./routes/video.routes.js";
+import updateVideoRouter from "./routes/video.routes.js";
 
 app.use("/api/v1/healthcheck", healthCheckRouter);
 app.use("/api/v1/users", userRouter);
@@ -51,5 +53,7 @@ app.use("/api/v1/users", getWatchHistoryRouter);
 app.use("/api/v1/video", publishVideoRouter);
 app.use("/api/v1/video", getVideoByusernameRouter);
 app.use("/api/v1/video", getVideoByIdRouter);
+app.use("/api/v1/video", getAllvideosRouter);
+app.use("/api/v1/video", updateVideoRouter);
 
 export { app };

@@ -3,6 +3,8 @@ import {
   publishVideo,
   getVideoByusername,
   getVideoById,
+  getAllvideos,
+  updateVideo,
 } from "../controller/video.cotroller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJwt } from "../middlewares/auth.middleware.js";
@@ -30,4 +32,9 @@ router
   .route("/getVideoByusername/:username")
   .get(verifyJwt, getVideoByusername);
 router.route("/getVideoById/:VideoId").get(verifyJwt, getVideoById);
+
+router.route("/getallVideos").get(verifyJwt, getAllvideos);
+router
+  .route("/updateVideo")
+  .patch(upload.single("videoFile"), verifyJwt, updateVideo);
 export default router;
