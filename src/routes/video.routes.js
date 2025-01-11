@@ -5,6 +5,7 @@ import {
   getVideoById,
   getAllvideos,
   updateVideo,
+  deleteVideo,
 } from "../controller/video.cotroller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJwt } from "../middlewares/auth.middleware.js";
@@ -37,4 +38,7 @@ router.route("/getallVideos").get(verifyJwt, getAllvideos);
 router
   .route("/updateVideo")
   .patch(upload.single("videoFile"), verifyJwt, updateVideo);
+
+router.route("/deleteVideo/:VideoId").delete(verifyJwt, deleteVideo);
+
 export default router;

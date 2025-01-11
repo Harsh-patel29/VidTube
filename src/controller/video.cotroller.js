@@ -98,23 +98,6 @@ const publishVideo = AsyncHandler(async (req, res) => {
         `Video Published Successfully By ${uploadBY}!!`
       )
     );
-
-  //   const user = await User.aggregate([
-  //     {
-  //       $match: {
-  //         _id: new mongoose.Types.ObjectId(req.user?._id),
-  //       },
-  //     },
-  //     {
-  //       $lookup: {
-  //         from: "users",
-  //         localField: "username",
-  //         foreignField: "publishedBy",
-  //         as: "publishedBy",
-  //       },
-  //     },
-  //   ]);
-  //   console.log(user);
 });
 
 const getVideoByusername = AsyncHandler(async (req, res) => {
@@ -261,10 +244,29 @@ const updateVideo = AsyncHandler(async (req, res) => {
     );
   }
 });
+
+const deleteVideo = AsyncHandler(async (req, res) => {
+  const { VideoId } = req.params;
+  if (!VideoId) {
+    throw new ApiError(400, "VideoID must needed.");
+  }
+  const id = new mongoose.Types.ObjectId(VideoId);
+  const deletedVideo = await Video.findByIdAndDelete(id);
+  if (deletedVideo) {
+    console.log("Video deleted successfully");
+    return res
+      .status(200)
+      .json(new ApiResponse(200, deletedVideo, "Video deleted"));
+  } else {
+    throw new ApiError(500, "Something went wrong while deleting video");
+  }
+});
+
 export {
   publishVideo,
   getVideoByusername,
   getVideoById,
   getAllvideos,
   updateVideo,
+  deleteVideo,
 };
