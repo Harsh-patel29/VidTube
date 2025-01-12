@@ -41,6 +41,8 @@ import updateVideoRouter from "./routes/video.routes.js";
 import deleteVideoRouter from "./routes/video.routes.js";
 import createTweetRouter from "./routes/tweet.routes.js";
 import getUserTweetRouter from "./routes/tweet.routes.js";
+import updateTweetRouter from "./routes/tweet.routes.js";
+import deleteTweetRouter from "./routes/tweet.routes.js";
 
 app.use("/api/v1/healthcheck", healthCheckRouter);
 app.use("/api/v1/users", userRouter);
@@ -61,5 +63,7 @@ app.use("/api/v1/video", updateVideoRouter);
 app.use("/api/v1/video", deleteVideoRouter);
 app.use("/api/v1/tweet", createTweetRouter);
 app.use("/api/v1/tweet", getUserTweetRouter);
+app.use("/api/v1/tweet", updateTweetRouter);
+app.use("/api/v1/tweet", deleteTweetRouter);
 
 export { app };

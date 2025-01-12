@@ -55,8 +55,69 @@ const getUserTweet = AsyncHandler(async (req, res) => {
     .json(new ApiResponse(200, tweets, "Tweet by the users are"));
 });
 
-const updateTweet = AsyncHandler(async (req, res) => {});
+const updateTweet = AsyncHandler(async (req, res) => {
+  const { content } = req.body;
+  if (!content) {
+    throw new ApiError(400, "tweet is required");
+  }
+  const id = await User.findById(req.user._id);
+  const userId = id._id;
+  // console.log(userId);
 
-const deleteTweet = AsyncHandler(async (req, res) => {});
+  const owner = await Tweet.aggregate([
+    {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "TweetId",
+      },
+    },
+    {
+      $match: {
+        owner: userId,
+      },
+    },
+    {
+      $project: { TweetId: 0 },
+    },
+  ]);
+  // console.log(owner);
+  const ObjId = owner[0].owner;
+  console.log(userId.equals(ObjId));
+
+  if (userId.equals(ObjId)) {
+    const tweetId = await Tweet.findByIdAndUpdate(
+      owner,
+      {
+        $set: {
+          content: content,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    // console.log(tweetId);
+    return res.status(200).json(new ApiResponse(200, tweetId, "Tweet updated"));
+  } else {
+    throw new ApiError(400, "Please Login");
+  }
+});
+
+const deleteTweet = AsyncHandler(async (req, res) => {
+  const { TweetId } = req.params;
+  if (!TweetId) {
+    throw new ApiError(400, "TweetId not found");
+  }
+  const deletedTweet = await Tweet.findByIdAndDelete(TweetId);
+  if (deletedTweet) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, deletedTweet, "Tweet deleted Successfully"));
+  } else {
+    throw new ApiResponse(500, "Something went wrong while deleting tweet");
+  }
+});
 
 export { createTweet, getUserTweet, updateTweet, deleteTweet };
